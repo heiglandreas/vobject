@@ -25,6 +25,10 @@ class TimeZoneUtil
 
     public static function addTimezoneGuesser(TimezoneGuesser $guesser): void
     {
+        $key = array_search($guesser, self::$timezoneGuessers);
+        if (false !== $key) {
+            unset(self::$timezoneGuessers[$key]);
+        }
         self::$timezoneGuessers[] = $guesser;
     }
 

@@ -3,6 +3,7 @@
 namespace Sabre\VObject;
 
 use PHPUnit\Framework\TestCase;
+use Sabre\VObject\TimezoneGuesser\TimezoneGuesser;
 
 class TimeZoneUtilTest extends TestCase
 {
@@ -355,5 +356,26 @@ HI;
         $tz = TimeZoneUtil::getTimeZone('(UTC-05:00) Eastern Time (US & Canada)');
         $ex = new \DateTimeZone('America/New_York');
         $this->assertEquals($ex->getName(), $tz->getName());
+    }
+
+    public function testLoadingFurtherTimezoneGuesser()
+    {
+        $guesser1 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
+        $guesser2 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
+
+        $cookieThief = function ($util) {
+            return $util::$timezoneGuessers;
+        };
+        $cookieThief = \Closure::bind($cookieThief, null, TimeZoneUtil::class);
+
+        $this->assertCount(2, $cookieThief(TimeZoneUtil::class));
+        TimezoneUtil::addTimezoneGuesser($guesser1);
+        $guesser = $cookieThief(TimeZoneUtil::class);
+        $this->assertCount(3, $guesser);
+        $this->assertSame($guesser1, array_pop($guesser));
+        TimezoneUtil::addTimezoneGuesser($guesser2);
+        $guesser = $cookieThief(TimeZoneUtil::class);
+        $this->assertCount(3, $guesser);
+        $this->assertSame($guesser2, array_pop($guesser));
     }
 }
