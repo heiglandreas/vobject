@@ -3,6 +3,7 @@
 namespace Sabre\VObject;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Sabre\VObject\TimezoneGuesser\TimezoneGuesser;
 
 class TimeZoneUtilTest extends TestCase
@@ -362,34 +363,5 @@ HI;
         $tz = TimeZoneUtil::getTimeZone('(UTC-05:00) Eastern Time (US & Canada)');
         $ex = new \DateTimeZone('America/New_York');
         $this->assertEquals($ex->getName(), $tz->getName());
-    }
-
-    public function testLoadingFurtherTimezoneGuesser()
-    {
-        $guesser1 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
-        $guesser2 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
-
-        $cookieThief = function (TimezoneUtil $util) {
-            return $util->timezoneGuessers;
-        };
-
-        $getCallback = function() {
-            // As of PHP 5.6 we can use $this->fn(...func_get_args()) instead of call_user_func_array
-            return self::getInstance();
-        };
-
-        $get = $getCallback->bindTo(null);
-
-        $cookieThief = \Closure::bind($cookieThief, null, $get());
-
-        $this->assertCount(2, $cookieThief(TimeZoneUtil::class));
-        TimezoneUtil::addTimezoneGuesser($guesser1);
-        $guesser = $cookieThief(TimeZoneUtil::class);
-        $this->assertCount(3, $guesser);
-        $this->assertSame($guesser1, array_pop($guesser));
-        TimezoneUtil::addTimezoneGuesser($guesser2);
-        $guesser = $cookieThief(TimeZoneUtil::class);
-        $this->assertCount(3, $guesser);
-        $this->assertSame($guesser2, array_pop($guesser));
     }
 }
