@@ -124,4 +124,9 @@ class TimeZoneUtil
     {
         return self::getInstance()->findTimeZone($tzid, $vcalendar, $failIfUncertain);
     }
+
+    public static function clean(): void
+    {
+        self::$instance = null;
+    }
 }

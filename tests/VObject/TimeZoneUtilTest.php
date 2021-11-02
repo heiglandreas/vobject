@@ -10,7 +10,7 @@ class TimeZoneUtilTest extends TestCase
     public function setUp()
     {
         // clearning the tz cache
-        TimezoneUtil::$map = null;
+        TimezoneUtil::clean();
     }
 
     /**
@@ -32,14 +32,20 @@ class TimeZoneUtilTest extends TestCase
 
     public function getMapping()
     {
-        TimeZoneUtil::loadTzMaps();
+
+        $map = array_merge(
+            include __DIR__.'/../../lib/timezonedata/windowszones.php',
+            include __DIR__.'/../../lib/timezonedata/lotuszones.php',
+            include __DIR__.'/../../lib/timezonedata/exchangezones.php',
+            include __DIR__.'/../../lib/timezonedata/php-workaround.php'
+        );
 
         // PHPUNit requires an array of arrays
         return array_map(
             function ($value) {
                 return [$value];
             },
-            TimeZoneUtil::$map
+            $map
         );
     }
 
