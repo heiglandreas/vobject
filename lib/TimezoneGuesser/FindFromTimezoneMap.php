@@ -22,7 +22,7 @@ class FindFromTimezoneMap implements TimezoneFinder
     {
         // Next, we check if the tzid is somewhere in our tzid map.
         if ($this->hasTzInMap($tzid)) {
-            return new DateTimeZone($this->getTzFromMap($tzid()));
+            return new DateTimeZone($this->getTzFromMap($tzid));
         }
 
         // Some Microsoft products prefix the offset first, so let's strip that off
