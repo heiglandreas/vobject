@@ -7,7 +7,7 @@ use Sabre\VObject\TimezoneGuesser\TimezoneGuesser;
 
 class TimeZoneUtilTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         // clearning the tz cache
         TimezoneUtil::clean();
@@ -378,7 +378,7 @@ HI;
             return self::getInstance();
         };
 
-        $get = $getCallback->bindTo(null, TimezoneUtil::class);
+        $get = $getCallback->bindTo(null);
 
         $cookieThief = \Closure::bind($cookieThief, null, $get());
 
