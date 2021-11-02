@@ -201,7 +201,7 @@ HI;
             function ($value) {
                 return [$value];
             },
-            TimeZoneUtil::getIdentifiersBC()
+            include __DIR__.'/../../lib/timezonedata/php-bc.php'
         );
     }
 
@@ -369,10 +369,18 @@ HI;
         $guesser1 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
         $guesser2 = $this->getMockBuilder(TimezoneGuesser::class)->getMock();
 
-        $cookieThief = function ($util) {
-            return $util::$timezoneGuessers;
+        $cookieThief = function (TimezoneUtil $util) {
+            return $util->timezoneGuessers;
         };
-        $cookieThief = \Closure::bind($cookieThief, null, TimeZoneUtil::class);
+
+        $getCallback = function() {
+            // As of PHP 5.6 we can use $this->fn(...func_get_args()) instead of call_user_func_array
+            return self::getInstance();
+        };
+
+        $get = $getCallback->bindTo(null, TimezoneUtil::class);
+
+        $cookieThief = \Closure::bind($cookieThief, null, $get());
 
         $this->assertCount(2, $cookieThief(TimeZoneUtil::class));
         TimezoneUtil::addTimezoneGuesser($guesser1);
